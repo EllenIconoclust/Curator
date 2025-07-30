@@ -17,7 +17,7 @@
       background: linear-gradient(135deg, #e0f8e9, #ffffff);
       color: #222;
       padding: 2rem;
-      line-height: 1.6;
+      line-height: 1.8;
     }
 
     body.dark {
@@ -33,10 +33,10 @@
     }
 
     .toggle-btn {
-      width: 32px;
-      height: 32px;
+      width: 28px;
+      height: 28px;
       border-radius: 50%;
-      background: #d1b74c;
+      background: #c9a935;
       border: none;
       cursor: pointer;
       position: relative;
@@ -47,31 +47,31 @@
     }
 
     .toggle-btn.dark {
-      background: #3b6fa3;
+      background: #315f91;
     }
 
     .toggle-icon {
-      width: 14px;
-      height: 14px;
+      width: 12px;
+      height: 12px;
       border-radius: 50%;
       background: white;
       box-shadow: 0 0 3px rgba(0,0,0,0.2);
     }
 
     h1 {
-      margin-bottom: 1.5rem;
-      font-size: 2rem;
+      margin-bottom: 2rem;
+      font-size: 2.5rem;
     }
 
     .section {
-      margin-bottom: 4rem;
+      margin-bottom: 5rem;
     }
 
     .activity {
       background: rgba(255,255,255,0.2);
       padding: 1rem;
       border-radius: 12px;
-      margin-top: 0.5rem;
+      margin-top: 0.8rem;
       cursor: pointer;
     }
 
@@ -82,7 +82,7 @@
     .activity-details {
       display: none;
       margin-top: 0.5rem;
-      font-size: 0.95rem;
+      font-size: 1rem;
       opacity: 0.9;
     }
 
@@ -93,10 +93,11 @@
     table {
       border-collapse: collapse;
       width: 100%;
+      font-size: 1rem;
     }
 
     th, td {
-      padding: 0.6rem;
+      padding: 0.8rem;
       text-align: center;
       border: 1px solid #ccc;
     }
@@ -107,49 +108,43 @@
     }
 
     input[type="text"], textarea {
-      padding: 0.5rem;
-      width: 80%;
-      margin-top: 0.5rem;
+      padding: 0.8rem;
+      width: 100%;
+      margin-top: 0.7rem;
       border: 1px solid #aaa;
-      border-radius: 6px;
+      border-radius: 8px;
+      font-size: 1rem;
     }
 
     button.save, button.spin, button.submit-problem {
-      margin-top: 0.5rem;
-      padding: 0.4rem 1rem;
+      margin-top: 1rem;
+      padding: 0.7rem 1.4rem;
       background: #7acaa3;
       border: none;
-      border-radius: 6px;
+      border-radius: 8px;
       cursor: pointer;
-    }
-
-    .spinner {
-      width: 100px;
-      height: 100px;
-      border: 10px solid #ccc;
-      border-top: 10px solid #4CAF50;
-      border-radius: 50%;
-      animation: none;
-      margin: 1rem auto;
-    }
-
-    @keyframes spin {
-      100% { transform: rotate(360deg); }
+      font-size: 1rem;
     }
 
     .mood-options span {
-      font-size: 1.5rem;
+      font-size: 1.8rem;
       cursor: pointer;
-      margin-right: 0.5rem;
+      margin-right: 0.7rem;
     }
 
     .did-you-know {
       padding: 1rem;
       background: #d2f3e6;
       border-left: 5px solid #49a379;
-      margin-top: 4rem;
       border-radius: 8px;
+      font-size: 1.1rem;
     }
+
+    #mood-message, #saved-note, #response-message {
+      margin-top: 1rem;
+      font-size: 1rem;
+    }
+
   </style>
 </head>
 <body>
@@ -201,14 +196,8 @@
   </div>
 
   <div class="section">
-    <h2>🌀 Fidget Corner</h2>
-    <div class="spinner" id="spinner"></div>
-    <button class="spin" onclick="spin()">Spin</button>
-  </div>
-
-  <div class="section">
     <h2>💬 Share Your Problem</h2>
-    <textarea id="problem" rows="4" placeholder="Type what's on your mind..."></textarea><br>
+    <textarea id="problem" rows="5" placeholder="Type what's on your mind..."></textarea><br>
     <button class="submit-problem" onclick="respondToProblem()">Submit</button>
     <p id="response-message"></p>
   </div>
@@ -263,17 +252,11 @@
       localStorage.setItem("mood-" + new Date().toDateString(), mood);
     }
 
-    function spin() {
-      const spinner = document.getElementById("spinner");
-      spinner.style.animation = "spin 2s ease-out";
-      setTimeout(() => spinner.style.animation = "", 2000);
-    }
-
     function respondToProblem() {
       const input = document.getElementById("problem").value;
       const msg = document.getElementById("response-message");
       if (input.trim() !== "") {
-        msg.textContent = "Thank you for sharing. Healing is a process, and every step you take matters. No matter what you're facing, know that you are not alone, and there is light even in the darkest moments. Keep going, you're doing better than you think.";
+        msg.textContent = "Thank you for sharing. Healing is a process, and every step you take matters. You're not alone.";
       } else {
         msg.textContent = "";
       }
