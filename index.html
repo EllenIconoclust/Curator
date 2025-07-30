@@ -34,7 +34,7 @@
       width: 40px;
       height: 40px;
       border-radius: 50%;
-      background: #f4cd67;
+      background: #e6c04e;
       border: none;
       cursor: pointer;
       position: relative;
@@ -47,10 +47,10 @@
 
     .toggle-icon {
       position: absolute;
-      width: 20px;
-      height: 20px;
-      top: 10px;
-      left: 10px;
+      width: 16px;
+      height: 16px;
+      top: 12px;
+      left: 12px;
       border-radius: 50%;
       background: white;
       box-shadow: 0 0 5px rgba(0,0,0,0.2);
@@ -103,12 +103,7 @@
       font-weight: bold;
     }
 
-    audio {
-      margin-top: 1rem;
-      width: 100%;
-    }
-
-    input[type="text"] {
+    input[type="text"], textarea {
       padding: 0.5rem;
       width: 80%;
       margin-top: 0.5rem;
@@ -116,13 +111,41 @@
       border-radius: 6px;
     }
 
-    button.save {
+    button.save, button.spin, button.submit-problem {
       margin-top: 0.5rem;
       padding: 0.4rem 1rem;
       background: #7acaa3;
       border: none;
       border-radius: 6px;
       cursor: pointer;
+    }
+
+    .spinner {
+      width: 100px;
+      height: 100px;
+      border: 10px solid #ccc;
+      border-top: 10px solid #4CAF50;
+      border-radius: 50%;
+      animation: none;
+      margin: 1rem auto;
+    }
+
+    @keyframes spin {
+      100% { transform: rotate(360deg); }
+    }
+
+    .mood-options span {
+      font-size: 1.5rem;
+      cursor: pointer;
+      margin-right: 0.5rem;
+    }
+
+    .did-you-know {
+      padding: 1rem;
+      background: #d2f3e6;
+      border-left: 5px solid #49a379;
+      margin-bottom: 1rem;
+      border-radius: 8px;
     }
   </style>
 </head>
@@ -134,6 +157,10 @@
   </div>
 
   <h1>MindEase</h1>
+
+  <div class="did-you-know" id="fact-box">
+    🌟 Did you know? Taking just 5 minutes to breathe deeply can reduce stress significantly.
+  </div>
 
   <div class="section">
     <h2>🍃 Peace Activities</h2>
@@ -155,20 +182,42 @@
     </div>
   </div>
 
-  <div class="section calendar">
-    <h2>Wellness Calendar</h2>
+  <div class="section">
+    <h2>📅 Wellness Calendar</h2>
     <table id="calendar"></table>
     <input type="text" id="note" placeholder="Add note for today">
     <button class="save" onclick="saveNote()">Save</button>
     <p id="saved-note"></p>
   </div>
 
+  <div class="section">
+    <h2>📊 Mood Tracker</h2>
+    <div class="mood-options">
+      <span onclick="saveMood('😊')">😊</span>
+      <span onclick="saveMood('😐')">😐</span>
+      <span onclick="saveMood('😢')">😢</span>
+      <span onclick="saveMood('😡')">😡</span>
+    </div>
+    <p id="mood-message"></p>
+  </div>
+
+  <div class="section">
+    <h2>🌀 Fidget Corner</h2>
+    <div class="spinner" id="spinner"></div>
+    <button class="spin" onclick="spin()">Spin</button>
+  </div>
+
+  <div class="section">
+    <h2>💬 Share Your Problem</h2>
+    <textarea id="problem" rows="4" placeholder="Type what's on your mind..."></textarea><br>
+    <button class="submit-problem" onclick="respondToProblem()">Submit</button>
+    <p id="response-message"></p>
+  </div>
+
   <script>
     function toggleDarkMode() {
-      const body = document.body;
-      const toggle = document.querySelector(".toggle-btn");
-      body.classList.toggle("dark");
-      toggle.classList.toggle("dark");
+      document.body.classList.toggle("dark");
+      document.querySelector(".toggle-btn").classList.toggle("dark");
     }
 
     function toggleDetails(el) {
@@ -206,10 +255,47 @@
       }
     }
 
+    function saveMood(mood) {
+      document.getElementById("mood-message").textContent = "You logged your mood as: " + mood;
+      localStorage.setItem("mood-" + new Date().toDateString(), mood);
+    }
+
+    function spin() {
+      const spinner = document.getElementById("spinner");
+      spinner.style.animation = "spin 2s ease-out";
+      setTimeout(() => spinner.style.animation = "", 2000);
+    }
+
+    function respondToProblem() {
+      const input = document.getElementById("problem").value;
+      const msg = document.getElementById("response-message");
+      if (input.trim() !== "") {
+        msg.textContent = "Thank you for sharing. Healing is a process, and every step you take matters. No matter what you're facing, know that you are not alone, and there is light even in the darkest moments. Keep going, you're doing better than you think.";
+      } else {
+        msg.textContent = "";
+      }
+    }
+
+    const facts = [
+      "Smiling can improve your mood, even if you're faking it!",
+      "Sleep is deeply connected to mental health—aim for 7-9 hours.",
+      "A 10-minute walk can boost your mental clarity.",
+      "Journaling regularly can reduce anxiety.",
+      "Being kind to others boosts your own serotonin."
+    ];
+
+    setInterval(() => {
+      const box = document.getElementById("fact-box");
+      const randomFact = facts[Math.floor(Math.random() * facts.length)];
+      box.textContent = "🌟 Did you know? " + randomFact;
+    }, 10000);
+
     window.onload = function() {
       buildCalendar();
       const saved = localStorage.getItem("note-" + new Date().toDateString());
       if (saved) document.getElementById("saved-note").textContent = "Saved for today: " + saved;
+      const mood = localStorage.getItem("mood-" + new Date().toDateString());
+      if (mood) document.getElementById("mood-message").textContent = "You logged your mood as: " + mood;
     };
   </script>
 </body>
