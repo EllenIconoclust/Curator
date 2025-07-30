@@ -2,110 +2,223 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Mind Healing Space</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Peaceful Mind</title>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-color: #ffffff;
-      --text-color: #222222;
-      --card-color: #f2f2f2;
-    }
-
-    body.dark-mode {
-      --bg-color: #121212;
-      --text-color: #ffffff;
-      --card-color: #1e1e1e;
+    * {
+      margin: 0;
+      padding: 0;
+      font-family: 'Quicksand', sans-serif;
+      box-sizing: border-box;
     }
 
     body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      transition: background-color 0.3s, color 0.3s;
+      transition: background 1s, color 1s;
+      background: linear-gradient(135deg, #e0f8e9, #ffffff);
+      color: #222;
+      padding: 2rem;
     }
 
-    .container {
-      max-width: 700px;
-      margin: 5% auto;
-      padding: 20px;
-      background-color: var(--card-color);
-      border-radius: 12px;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    body.dark {
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: #f1f1f1;
     }
 
-    h1 {
-      text-align: center;
-      margin-bottom: 20px;
+    .toggle-wrapper {
+      position: fixed;
+      top: 20px;
+      right: 20px;
     }
 
     .toggle-btn {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 20px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #f4cd67;
+      border: none;
+      cursor: pointer;
+      position: relative;
+      transition: background 0.4s;
     }
 
-    button {
-      padding: 10px 20px;
-      border: none;
-      background-color: #4CAF50;
-      color: white;
-      border-radius: 20px;
-      font-size: 16px;
+    .toggle-btn.dark {
+      background: #4e8bd5;
+    }
+
+    .toggle-icon {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      top: 10px;
+      left: 10px;
+      border-radius: 50%;
+      background: white;
+      box-shadow: 0 0 5px rgba(0,0,0,0.2);
+    }
+
+    h1 {
+      margin-bottom: 1rem;
+    }
+
+    .section {
+      margin-bottom: 2rem;
+    }
+
+    .activity {
+      background: rgba(255,255,255,0.2);
+      padding: 1rem;
+      border-radius: 12px;
+      margin-top: 0.5rem;
       cursor: pointer;
     }
 
-    button:hover {
-      background-color: #3e8e41;
+    .activity:hover {
+      background: rgba(255,255,255,0.1);
     }
 
-    .message {
-      font-size: 1.2rem;
+    .activity-details {
+      display: none;
+      margin-top: 0.5rem;
+      font-size: 0.95rem;
+      opacity: 0.9;
+    }
+
+    .calendar {
+      margin-top: 1rem;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    th, td {
+      padding: 0.6rem;
       text-align: center;
-      margin: 30px 0;
+      border: 1px solid #ccc;
+    }
+
+    td.today {
+      background: #a0f3ba;
+      font-weight: bold;
     }
 
     audio {
+      margin-top: 1rem;
       width: 100%;
-      margin-top: 20px;
     }
 
-    .credit {
-      text-align: center;
-      font-size: 12px;
-      color: gray;
-      margin-top: 30px;
+    input[type="text"] {
+      padding: 0.5rem;
+      width: 80%;
+      margin-top: 0.5rem;
+      border: 1px solid #aaa;
+      border-radius: 6px;
+    }
+
+    button.save {
+      margin-top: 0.5rem;
+      padding: 0.4rem 1rem;
+      background: #7acaa3;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Mind Healing Space</h1>
+  <div class="toggle-wrapper">
+    <button class="toggle-btn" onclick="toggleDarkMode()">
+      <div class="toggle-icon"></div>
+    </button>
+  </div>
 
-    <div class="toggle-btn">
-      <button onclick="toggleDarkMode()">Toggle Dark Mode</button>
-    </div>
+  <h1>🧘 Peaceful Mind Center</h1>
 
-    <div class="message">
-      Breathe in... and out.<br><br>
-      You are safe here.<br>
-      Let your mind rest. Let go of the pain. You deserve peace.
-    </div>
-
-    <audio controls autoplay loop>
-      <source src="ever_mindful.mp3" type="audio/mpeg">
-      Your browser does not support the audio element.
+  <div class="section">
+    <h2>🎵 Calming Music</h2>
+    <p>Now Playing: "Peaceful Vibes"</p>
+    <audio controls loop>
+      <source src="https://cdn.pixabay.com/audio/2023/02/21/audio_57e778b1e3.mp3" type="audio/mp3">
     </audio>
+  </div>
 
-    <div class="credit">
-      Music: "Ever Mindful" by Kevin MacLeod – [incompetech.com]
+  <div class="section">
+    <h2>🛠️ Peace Activities</h2>
+    <div class="activity" onclick="toggleDetails(this)">
+      Deep Breathing
+      <div class="activity-details">Breathe in for 4 seconds, hold for 4, and breathe out for 4. Repeat 5 times.</div>
     </div>
+    <div class="activity" onclick="toggleDetails(this)">
+      Journaling
+      <div class="activity-details">Write down your thoughts without filtering them. Let your emotions flow out safely.</div>
+    </div>
+    <div class="activity" onclick="toggleDetails(this)">
+      Body Scan Meditation
+      <div class="activity-details">Focus on each part of your body from head to toe, noticing tension and relaxing it.</div>
+    </div>
+    <div class="activity" onclick="toggleDetails(this)">
+      Gratitude Exercise
+      <div class="activity-details">List 3 things you're grateful for today and reflect on why they matter to you.</div>
+    </div>
+  </div>
+
+  <div class="section calendar">
+    <h2>📅 Wellness Calendar</h2>
+    <table id="calendar"></table>
+    <input type="text" id="note" placeholder="Add note for today">
+    <button class="save" onclick="saveNote()">Save</button>
+    <p id="saved-note"></p>
   </div>
 
   <script>
     function toggleDarkMode() {
-      document.body.classList.toggle("dark-mode");
+      const body = document.body;
+      const toggle = document.querySelector(".toggle-btn");
+      body.classList.toggle("dark");
+      toggle.classList.toggle("dark");
     }
+
+    function toggleDetails(el) {
+      const detail = el.querySelector(".activity-details");
+      detail.style.display = detail.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function buildCalendar() {
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = today.getMonth();
+      const day = today.getDate();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const firstDay = new Date(year, month, 1).getDay();
+      const calendar = document.getElementById("calendar");
+      const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+      let html = "<tr>" + weekdays.map(d => `<th>${d}</th>`).join('') + "</tr><tr>";
+      for (let i = 0; i < firstDay; i++) html += "<td></td>";
+      for (let d = 1; d <= daysInMonth; d++) {
+        const isToday = d === day ? 'today' : '';
+        html += `<td class="${isToday}">${d}</td>`;
+        if ((firstDay + d) % 7 === 0) html += "</tr><tr>";
+      }
+      html += "</tr>";
+      calendar.innerHTML = html;
+    }
+
+    function saveNote() {
+      const note = document.getElementById("note").value;
+      const saved = document.getElementById("saved-note");
+      if (note) {
+        saved.textContent = "Saved for today: " + note;
+        localStorage.setItem("note-" + new Date().toDateString(), note);
+      }
+    }
+
+    window.onload = function() {
+      buildCalendar();
+      const saved = localStorage.getItem("note-" + new Date().toDateString());
+      if (saved) document.getElementById("saved-note").textContent = "Saved for today: " + saved;
+    };
   </script>
 </body>
 </html>
