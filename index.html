@@ -17,6 +17,7 @@
       background: linear-gradient(135deg, #e0f8e9, #ffffff);
       color: #222;
       padding: 2rem;
+      line-height: 1.6;
     }
 
     body.dark {
@@ -28,40 +29,42 @@
       position: fixed;
       top: 20px;
       right: 20px;
+      z-index: 999;
     }
 
     .toggle-btn {
-      width: 40px;
-      height: 40px;
+      width: 32px;
+      height: 32px;
       border-radius: 50%;
-      background: #e6c04e;
+      background: #d1b74c;
       border: none;
       cursor: pointer;
       position: relative;
       transition: background 0.4s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .toggle-btn.dark {
-      background: #4e8bd5;
+      background: #3b6fa3;
     }
 
     .toggle-icon {
-      position: absolute;
-      width: 16px;
-      height: 16px;
-      top: 12px;
-      left: 12px;
+      width: 14px;
+      height: 14px;
       border-radius: 50%;
       background: white;
-      box-shadow: 0 0 5px rgba(0,0,0,0.2);
+      box-shadow: 0 0 3px rgba(0,0,0,0.2);
     }
 
     h1 {
-      margin-bottom: 1rem;
+      margin-bottom: 1.5rem;
+      font-size: 2rem;
     }
 
     .section {
-      margin-bottom: 2rem;
+      margin-bottom: 4rem;
     }
 
     .activity {
@@ -144,7 +147,7 @@
       padding: 1rem;
       background: #d2f3e6;
       border-left: 5px solid #49a379;
-      margin-bottom: 1rem;
+      margin-top: 4rem;
       border-radius: 8px;
     }
   </style>
@@ -157,10 +160,6 @@
   </div>
 
   <h1>MindEase</h1>
-
-  <div class="did-you-know" id="fact-box">
-    🌟 Did you know? Taking just 5 minutes to breathe deeply can reduce stress significantly.
-  </div>
 
   <div class="section">
     <h2>🍃 Peace Activities</h2>
@@ -212,6 +211,10 @@
     <textarea id="problem" rows="4" placeholder="Type what's on your mind..."></textarea><br>
     <button class="submit-problem" onclick="respondToProblem()">Submit</button>
     <p id="response-message"></p>
+  </div>
+
+  <div class="did-you-know" id="fact-box">
+    🌟 Did you know? Taking just 5 minutes to breathe deeply can reduce stress significantly.
   </div>
 
   <script>
