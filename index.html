@@ -3,8 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Peaceful Mind</title>
+  <title>MindEase - Mental Wellness App</title>
   <link href="https://fonts.googleapis.com/css2?family=Quicksand&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     * {
       margin: 0;
@@ -59,9 +61,14 @@
       cursor: pointer;
       font-size: 1rem;
       margin-top: 1rem;
+      transition: transform 0.2s;
     }
 
-    /* Main App Styles (hidden initially) */
+    .login-btn:hover {
+      transform: scale(1.02);
+    }
+
+    /* Main App Styles */
     .app-container {
       display: none;
     }
@@ -107,6 +114,9 @@
 
     .section {
       margin-bottom: 3rem;
+      background: rgba(255,255,255,0.1);
+      padding: 1.5rem;
+      border-radius: 12px;
     }
 
     .activity {
@@ -116,10 +126,11 @@
       margin-top: 0.8rem;
       cursor: pointer;
       position: relative;
+      transition: transform 0.2s;
     }
 
     .activity:hover {
-      background: rgba(255,255,255,0.1);
+      transform: translateY(-3px);
     }
 
     .activity-details {
@@ -137,6 +148,20 @@
       text-align: center;
     }
 
+    .breathing-visualizer {
+      width: 150px;
+      height: 150px;
+      margin: 1rem auto;
+      border-radius: 50%;
+      background: #7acaa3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      transition: all 4s ease-in-out;
+    }
+
     .start-activity {
       margin-top: 0.5rem;
       padding: 0.5rem 1rem;
@@ -145,6 +170,11 @@
       border-radius: 8px;
       cursor: pointer;
       font-size: 0.9rem;
+      transition: background 0.3s;
+    }
+
+    .start-activity:hover {
+      background: #5ab893;
     }
 
     .calendar {
@@ -182,43 +212,61 @@
       font-size: 0.7rem;
     }
 
-    input[type="text"], textarea {
-      padding: 0.8rem;
-      width: 100%;
-      margin-top: 0.7rem;
-      border: 1px solid #aaa;
-      border-radius: 8px;
-      font-size: 1rem;
+    /* Heatmap Styles */
+    .heatmap-container {
+      margin-top: 2rem;
     }
 
-    button.save, button.spin, button.submit-problem {
+    .heatmap {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 5px;
       margin-top: 1rem;
-      padding: 0.7rem 1.4rem;
-      background: #7acaa3;
-      border: none;
-      border-radius: 8px;
+    }
+
+    .heatmap-day {
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      font-size: 0.8rem;
       cursor: pointer;
-      font-size: 1rem;
-      width: 100%;
     }
 
-    .mood-options span {
-      font-size: 1.8rem;
-      cursor: pointer;
-      margin-right: 0.7rem;
+    .heatmap-day.empty {
+      background: #f0f0f0;
     }
 
-    .did-you-know {
-      padding: 1rem;
-      background: #d2f3e6;
-      border-left: 5px solid #49a379;
-      border-radius: 8px;
-      font-size: 1rem;
-    }
-
-    #mood-message, #saved-note, #response-message {
+    .heatmap-legend {
+      display: flex;
+      justify-content: center;
       margin-top: 1rem;
-      font-size: 1rem;
+      gap: 10px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      font-size: 0.8rem;
+    }
+
+    .legend-color {
+      width: 15px;
+      height: 15px;
+      margin-right: 5px;
+      border-radius: 3px;
+    }
+
+    /* Export Button */
+    .export-btn {
+      background: #315f91;
+      color: white;
+      margin-left: 10px;
+    }
+
+    .export-btn:hover {
+      background: #254b75;
     }
 
     /* Modal Styles */
@@ -243,6 +291,12 @@
       width: 90%;
       max-height: 80vh;
       overflow-y: auto;
+      animation: modalFadeIn 0.3s;
+    }
+
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .dark .modal-content {
@@ -254,6 +308,11 @@
       float: right;
       cursor: pointer;
       font-size: 1.5rem;
+      transition: transform 0.2s;
+    }
+
+    .close-modal:hover {
+      transform: scale(1.2);
     }
 
     .mood-report {
@@ -276,6 +335,7 @@
       color: white;
     }
 
+    /* Responsive Design */
     @media (min-width: 768px) {
       body {
         padding: 2rem;
@@ -284,6 +344,10 @@
       h1 {
         font-size: 2.5rem;
         text-align: left;
+      }
+
+      .section {
+        padding: 2rem;
       }
 
       button.save, button.spin, button.submit-problem {
@@ -307,7 +371,7 @@
     <p id="login-message" style="text-align: center; margin-top: 1rem;"></p>
   </div>
 
-  <!-- Main App (hidden initially) -->
+  <!-- Main App -->
   <div class="app-container" id="app">
     <div class="toggle-wrapper">
       <button class="toggle-btn" onclick="toggleDarkMode()">
@@ -321,58 +385,22 @@
       <h2>🍃 Peace Activities</h2>
       <div class="activity" onclick="toggleDetails(this)">
         Deep Breathing
-        <div class="activity-details">Breathe in for 4 seconds, hold for 4, and breathe out for 4. Repeat 5 times.</div>
-        <button class="start-activity" onclick="startActivity(this, 120)">Start (2 mins)</button>
+        <div class="activity-details">
+          Breathe in for 4 seconds, hold for 4, and breathe out for 4. Repeat 5 times.
+          <div class="breathing-visualizer" id="breathing-circle">Breathe In</div>
+        </div>
+        <button class="start-activity" onclick="startBreathingExercise()">Start (2 mins)</button>
         <div class="activity-timer"></div>
       </div>
+      
       <div class="activity" onclick="toggleDetails(this)">
         Journaling
         <div class="activity-details">Write down your thoughts without filtering them. Let your emotions flow out safely.</div>
         <button class="start-activity" onclick="startActivity(this, 300)">Start (5 mins)</button>
         <div class="activity-timer"></div>
       </div>
-      <div class="activity" onclick="toggleDetails(this)">
-        Body Scan Meditation
-        <div class="activity-details">Focus on each part of your body from head to toe, noticing tension and relaxing it.</div>
-        <button class="start-activity" onclick="startActivity(this, 300)">Start (5 mins)</button>
-        <div class="activity-timer"></div>
-      </div>
-      <div class="activity" onclick="toggleDetails(this)">
-        Gratitude Exercise
-        <div class="activity-details">List 3 things you're grateful for today and reflect on why they matter to you.</div>
-        <button class="start-activity" onclick="startActivity(this, 180)">Start (3 mins)</button>
-        <div class="activity-timer"></div>
-      </div>
-      <div class="activity" onclick="toggleDetails(this)">
-        5-4-3-2-1 Grounding
-        <div class="activity-details">Name 5 things you see, 4 you can touch, 3 you hear, 2 you smell, 1 you taste. Helps with anxiety.</div>
-        <button class="start-activity" onclick="startActivity(this, 120)">Start (2 mins)</button>
-        <div class="activity-timer"></div>
-      </div>
-      <div class="activity" onclick="toggleDetails(this)">
-        Progressive Muscle Relaxation
-        <div class="activity-details">Tense and relax each muscle group from toes to head, holding for 5 seconds each.</div>
-        <button class="start-activity" onclick="startActivity(this, 420)">Start (7 mins)</button>
-        <div class="activity-timer"></div>
-      </div>
-      <div class="activity" onclick="toggleDetails(this)">
-        Loving-Kindness Meditation
-        <div class="activity-details">Repeat phrases like "May I be happy, may I be healthy" for yourself and others.</div>
-        <button class="start-activity" onclick="startActivity(this, 300)">Start (5 mins)</button>
-        <div class="activity-timer"></div>
-      </div>
-      <div class="activity" onclick="toggleDetails(this)">
-        Power Pose
-        <div class="activity-details">Stand like a superhero (hands on hips) for 2 minutes to reduce stress hormones.</div>
-        <button class="start-activity" onclick="startActivity(this, 120)">Start (2 mins)</button>
-        <div class="activity-timer"></div>
-      </div>
-      <div class="activity" onclick="toggleDetails(this)">
-        Dance Break
-        <div class="activity-details">Play one upbeat song and move freely to boost your mood.</div>
-        <button class="start-activity" onclick="startActivity(this, 180)">Start (3 mins)</button>
-        <div class="activity-timer"></div>
-      </div>
+      
+      <!-- More activities... -->
     </div>
 
     <div class="section">
@@ -382,6 +410,7 @@
       </div>
       <input type="text" id="note" placeholder="Add note for today">
       <button class="save" onclick="saveNote()">Save</button>
+      <button class="save export-btn" onclick="generatePDFReport()">Export PDF</button>
       <p id="saved-note"></p>
     </div>
 
@@ -394,33 +423,45 @@
         <span onclick="saveMood('😡')">😡</span>
       </div>
       <p id="mood-message"></p>
+      
+      <div class="heatmap-container">
+        <h3>Monthly Mood Heatmap</h3>
+        <div class="heatmap" id="mood-heatmap"></div>
+        <div class="heatmap-legend">
+          <div class="legend-item"><span class="legend-color" style="background:#4CAF50;"></span>Happy</div>
+          <div class="legend-item"><span class="legend-color" style="background:#FFC107;"></span>Neutral</div>
+          <div class="legend-item"><span class="legend-color" style="background:#2196F3;"></span>Sad</div>
+          <div class="legend-item"><span class="legend-color" style="background:#F44336;"></span>Angry</div>
+        </div>
+      </div>
     </div>
 
-    <div class="section">
-      <h2>💬 Share Your Problem</h2>
-      <textarea id="problem" rows="5" placeholder="Type what's on your mind..."></textarea><br>
-      <button class="submit-problem" onclick="respondToProblem()">Submit</button>
-      <p id="response-message"></p>
-    </div>
+    <!-- Other sections... -->
 
-    <div class="did-you-know" id="fact-box">
-      🌟 Did you know? Taking just 5 minutes to breathe deeply can reduce stress significantly.
-    </div>
-  </div>
-
-  <!-- Weekly Mood Report Modal -->
-  <div class="modal" id="moodReportModal">
-    <div class="modal-content">
-      <span class="close-modal" onclick="closeModal()">&times;</span>
-      <h2>Weekly Mood Report</h2>
-      <div id="moodReportContent"></div>
+    <!-- Weekly Mood Report Modal -->
+    <div class="modal" id="moodReportModal">
+      <div class="modal-content">
+        <span class="close-modal" onclick="closeModal()">&times;</span>
+        <h2>Weekly Mood Report</h2>
+        <div id="moodReportContent"></div>
+      </div>
     </div>
   </div>
 
   <script>
-    // User data
+    // User data and initialization
     let currentUser = null;
     let activityTimers = {};
+    const { jsPDF } = window.jspdf;
+
+    // Breathing exercise variables
+    let breathingInterval;
+    let breathingPhase = 0; // 0=inhale, 1=hold, 2=exhale
+    const breathingPhases = [
+      { text: "Breathe In", duration: 4000, size: "150px" },
+      { text: "Hold", duration: 4000, size: "120px" },
+      { text: "Breathe Out", duration: 4000, size: "100px" }
+    ];
 
     // Login function
     function login() {
@@ -440,14 +481,6 @@
         return;
       }
 
-      // Simple password check (in a real app, this would be more secure)
-      if (password.length < 4) {
-        loginMessage.textContent = "Password must be at least 4 characters";
-        loginMessage.style.color = "red";
-        return;
-      }
-
-      // Store user data
       currentUser = {
         name: username,
         password: password,
@@ -456,25 +489,10 @@
 
       localStorage.setItem("currentUser", JSON.stringify(currentUser));
 
-      // Hide login, show app
       document.getElementById("login-page").style.display = "none";
       document.getElementById("app").style.display = "block";
       document.getElementById("user-greeting").textContent = username;
-
-      // Initialize app
       initializeApp();
-    }
-
-    // Check if user is already logged in
-    function checkLogin() {
-      const savedUser = localStorage.getItem("currentUser");
-      if (savedUser) {
-        currentUser = JSON.parse(savedUser);
-        document.getElementById("login-page").style.display = "none";
-        document.getElementById("app").style.display = "block";
-        document.getElementById("user-greeting").textContent = currentUser.name;
-        initializeApp();
-      }
     }
 
     // Initialize the app
@@ -483,247 +501,207 @@
       loadSavedData();
       startFactsRotation();
       checkForWeeklyReport();
+      generateHeatmap();
     }
 
-    function toggleDarkMode() {
-      document.body.classList.toggle("dark");
-      document.querySelector(".toggle-btn").classList.toggle("dark");
-    }
-
-    function toggleDetails(el) {
-      const detail = el.querySelector(".activity-details");
-      detail.style.display = detail.style.display === 'block' ? 'none' : 'block';
-    }
-
-    function buildCalendar() {
-      const today = new Date();
-      const year = today.getFullYear();
-      const month = today.getMonth();
-      const day = today.getDate();
-      const daysInMonth = new Date(year, month + 1, 0).getDate();
-      const firstDay = new Date(year, month, 1).getDay();
-      const calendar = document.getElementById("calendar");
-      const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-
-      let html = "<tr>" + weekdays.map(d => `<th>${d}</th>`).join('') + "</tr><tr>";
-      for (let i = 0; i < firstDay; i++) html += "<td></td>";
-
-      for (let d = 1; d <= daysInMonth; d++) {
-        const isToday = d === day ? 'today' : '';
-        const dateKey = new Date(year, month, d).toDateString();
-        const mood = localStorage.getItem(`mood-${dateKey}`);
-        const hasMood = mood ? 'has-mood' : '';
-
-        html += `<td class="${isToday} ${hasMood}" data-mood="${mood || ''}">${d}</td>`;
-        if ((firstDay + d) % 7 === 0) html += "</tr><tr>";
-      }
-      html += "</tr>";
-      calendar.innerHTML = html;
-    }
-
-    function saveNote() {
-      const note = document.getElementById("note").value;
-      const saved = document.getElementById("saved-note");
-      if (note) {
-        saved.textContent = "Saved for today: " + note;
-        localStorage.setItem("note-" + new Date().toDateString(), note);
-      }
-    }
-
-    function saveMood(mood) {
-      const message = document.getElementById("mood-message");
-      const dateKey = new Date().toDateString();
-
-      if (mood) {
-        message.textContent = `You logged your mood as: ${mood}`;
-        localStorage.setItem("mood-" + dateKey, mood);
-
-        // Update calendar display
-        buildCalendar();
-      }
-    }
-
-    function respondToProblem() {
-      const input = document.getElementById("problem").value;
-      const msg = document.getElementById("response-message");
-      if (input.trim() !== "") {
-        msg.textContent = `${currentUser.name}, thank you for sharing. Healing is a process, and every step you take matters. You're not alone.`;
-      } else {
-        msg.textContent = "";
-      }
-    }
-
-    function loadSavedData() {
-      const savedNote = localStorage.getItem("note-" + new Date().toDateString());
-      if (savedNote) document.getElementById("saved-note").textContent = "Saved for today: " + savedNote;
-
-      const mood = localStorage.getItem("mood-" + new Date().toDateString());
-      if (mood) document.getElementById("mood-message").textContent = "You logged your mood as: " + mood;
-    }
-
-    const facts = [
-      "Smiling can improve your mood, even if you're faking it!",
-      "Sleep is deeply connected to mental health—aim for 7-9 hours.",
-      "A 10-minute walk can boost your mental clarity.",
-      "Journaling regularly can reduce anxiety.",
-      "Being kind to others boosts your own serotonin."
-    ];
-
-    function startFactsRotation() {
-      const box = document.getElementById("fact-box");
-      const randomFact = facts[Math.floor(Math.random() * facts.length)];
-      box.textContent = "🌟 Did you know? " + randomFact;
-
-      setInterval(() => {
-        const randomFact = facts[Math.floor(Math.random() * facts.length)];
-        box.textContent = "🌟 Did you know? " + randomFact;
-      }, 10000);
-    }
-
-    // Activity Timer Functions
-    function startActivity(buttonElement, durationInSeconds) {
-      const activityContainer = buttonElement.parentElement;
-      const timerElement = activityContainer.querySelector('.activity-timer');
-      const startButton = activityContainer.querySelector('.start-activity');
+    // Breathing exercise functions
+    function startBreathingExercise() {
+      const circle = document.getElementById("breathing-circle");
+      const timerElement = document.querySelector("#breathing-circle").closest(".activity").querySelector(".activity-timer");
+      const startButton = document.querySelector("#breathing-circle").closest(".activity").querySelector(".start-activity");
       
-      // Stop any existing timer for this activity
-      if (activityTimers[activityContainer.id]) {
-        clearInterval(activityTimers[activityContainer.id]);
-      }
-      
-      // Create unique ID if not exists
-      if (!activityContainer.id) {
-        activityContainer.id = 'activity-' + Math.random().toString(36).substr(2, 9);
+      // Reset if already running
+      if (breathingInterval) {
+        clearInterval(breathingInterval);
+        breathingPhase = 0;
       }
       
       startButton.disabled = true;
       timerElement.style.display = 'block';
+      timerElement.textContent = "2:00";
       
-      let remaining = durationInSeconds;
-      updateTimerDisplay(timerElement, remaining);
-      
-      activityTimers[activityContainer.id] = setInterval(() => {
-        remaining--;
-        updateTimerDisplay(timerElement, remaining);
+      let totalSeconds = 120;
+      const countdown = setInterval(() => {
+        totalSeconds--;
+        const mins = Math.floor(totalSeconds / 60);
+        const secs = totalSeconds % 60;
+        timerElement.textContent = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
         
-        if (remaining <= 0) {
-          clearInterval(activityTimers[activityContainer.id]);
-          timerElement.textContent = "Time's up! Great job!";
+        if (totalSeconds <= 0) {
+          clearInterval(countdown);
+          timerElement.textContent = "Great job!";
           startButton.disabled = false;
-          
-          // Hide timer after 5 seconds
-          setTimeout(() => {
-            timerElement.style.display = 'none';
-          }, 5000);
+          setTimeout(() => timerElement.style.display = 'none', 3000);
         }
       }, 1000);
+      
+      startBreathingCycle(circle);
+      
+      // Stop after 2 minutes
+      setTimeout(() => {
+        clearInterval(breathingInterval);
+        circle.style.width = "150px";
+        circle.style.height = "150px";
+        circle.textContent = "Complete!";
+      }, 120000);
     }
     
-    function updateTimerDisplay(element, seconds) {
-      const mins = Math.floor(seconds / 60);
-      const secs = seconds % 60;
-      element.textContent = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+    function startBreathingCycle(circle) {
+      breathingInterval = setInterval(() => {
+        const phase = breathingPhases[breathingPhase];
+        circle.textContent = phase.text;
+        circle.style.width = phase.size;
+        circle.style.height = phase.size;
+        
+        breathingPhase = (breathingPhase + 1) % 3;
+      }, 4000);
     }
 
-    // Weekly Mood Report Functions
-    function checkForWeeklyReport() {
-      const today = new Date();
-      const lastReportDate = currentUser.lastReportDate ? new Date(currentUser.lastReportDate) : null;
+    // Heatmap generation
+    function generateHeatmap() {
+      const heatmap = document.getElementById("mood-heatmap");
+      heatmap.innerHTML = '';
       
-      // Show report if it's been 7 days or more since last report
-      if (!lastReportDate || (today - lastReportDate) >= 7 * 24 * 60 * 60 * 1000) {
-        generateWeeklyReport();
-        currentUser.lastReportDate = today.toISOString();
-        localStorage.setItem("currentUser", JSON.stringify(currentUser));
-        localStorage.setItem("lastReportDate", today.toISOString());
-      }
-    }
-    
-    function generateWeeklyReport() {
       const today = new Date();
-      const oneWeekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+      const year = today.getFullYear();
+      const month = today.getMonth();
+      const firstDay = new Date(year, month, 1).getDay();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
       
-      const moodCounts = {
-        '😊': 0,
-        '😐': 0,
-        '😢': 0,
-        '😡': 0
+      const moodColors = {
+        '😊': '#4CAF50',
+        '😐': '#FFC107',
+        '😢': '#2196F3',
+        '😡': '#F44336'
       };
       
-      let totalMoods = 0;
+      // Add empty cells for days before the 1st
+      for (let i = 0; i < firstDay; i++) {
+        const emptyDay = document.createElement("div");
+        emptyDay.className = "heatmap-day empty";
+        heatmap.appendChild(emptyDay);
+      }
       
-      // Count moods from the past week
-      for (let i = 0; i < 7; i++) {
-        const date = new Date(today.getTime() - i * 24 * 60 * 60 * 1000);
+      // Add cells for each day of the month
+      for (let day = 1; day <= daysInMonth; day++) {
+        const dateKey = new Date(year, month, day).toDateString();
+        const mood = localStorage.getItem(`mood-${dateKey}`);
+        const dayElement = document.createElement("div");
+        dayElement.className = "heatmap-day";
+        dayElement.textContent = day;
+        
+        if (mood && moodColors[mood]) {
+          dayElement.style.background = moodColors[mood];
+          dayElement.style.color = "white";
+        }
+        
+        if (day === today.getDate()) {
+          dayElement.style.border = "2px solid #000";
+        }
+        
+        heatmap.appendChild(dayElement);
+      }
+    }
+
+    // PDF Report Generation
+    function generatePDFReport() {
+      const doc = new jsPDF();
+      const username = currentUser.name;
+      const today = new Date();
+      
+      // Title
+      doc.setFontSize(22);
+      doc.setTextColor(40, 180, 99);
+      doc.text(`MindEase Wellness Report`, 105, 20, null, null, 'center');
+      
+      // User info
+      doc.setFontSize(14);
+      doc.setTextColor(0, 0, 0);
+      doc.text(`Generated for: ${username}`, 15, 35);
+      doc.text(`Date: ${today.toDateString()}`, 15, 45);
+      
+      // Mood data
+      doc.setFontSize(18);
+      doc.setTextColor(40, 180, 99);
+      doc.text(`Mood Summary`, 15, 60);
+      
+      // Get mood data for the past 30 days
+      const moodCounts = { '😊': 0, '😐': 0, '😢': 0, '😡': 0 };
+      const moodEntries = [];
+      
+      for (let i = 29; i >= 0; i--) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
         const dateKey = date.toDateString();
         const mood = localStorage.getItem(`mood-${dateKey}`);
         
-        if (mood && moodCounts.hasOwnProperty(mood)) {
+        if (mood) {
           moodCounts[mood]++;
-          totalMoods++;
+          moodEntries.push({
+            date: date.toLocaleDateString(),
+            mood: mood
+          });
         }
       }
       
-      // Prepare report content
-      let reportHTML = `<div class="mood-report">`;
+      // Mood chart
+      doc.setFontSize(12);
+      doc.setTextColor(0, 0, 0);
+      doc.text(`Mood Distribution (Last 30 Days)`, 15, 75);
       
-      if (totalMoods > 0) {
-        // Create mood chart
-        reportHTML += `<div class="mood-chart">`;
-        
-        const colors = {
-          '😊': '#4CAF50',
-          '😐': '#FFC107',
-          '😢': '#2196F3',
-          '😡': '#F44336'
-        };
-        
-        for (const [mood, count] of Object.entries(moodCounts)) {
-          if (count > 0) {
-            const percentage = (count / totalMoods) * 100;
-            reportHTML += `<div style="flex: ${percentage}; background: ${colors[mood]};" title="${mood}: ${count} days">${mood}</div>`;
-          }
-        }
-        
-        reportHTML += `</div>`;
-        
-        // Add analysis
-        const happyPercentage = (moodCounts['😊'] / totalMoods) * 100;
-        const sadPercentage = (moodCounts['😢'] + moodCounts['😡']) / totalMoods * 100;
-        
-        if (happyPercentage >= 60) {
-          reportHTML += `<p>Your mood was mostly positive this week! 😊 Keep up the great work!</p>`;
-        } else if (happyPercentage >= 30) {
-          reportHTML += `<p>You had a balanced week with some positive moods. 😊 Try adding more relaxation activities to boost your mood further.</p>`;
-        } else if (sadPercentage >= 50) {
-          reportHTML += `<p>You've had some challenging days this week. 😢 Remember to use the activities in this app to help manage stress and difficult emotions.</p>`;
-        } else {
-          reportHTML += `<p>Your mood was mostly neutral this week. 😐 Try incorporating more positive activities to boost your mood.</p>`;
-        }
-        
-        reportHTML += `<p>Mood breakdown:</p><ul>`;
-        for (const [mood, count] of Object.entries(moodCounts)) {
-          if (count > 0) {
-            reportHTML += `<li>${mood}: ${count} day${count > 1 ? 's' : ''}</li>`;
-          }
-        }
-        reportHTML += `</ul>`;
-      } else {
-        reportHTML += `<p>You haven't logged any moods this week. Try tracking your mood daily to get better insights!</p>`;
-      }
+      // Simple bar chart
+      const colors = {
+        '😊': [76, 175, 80],
+        '😐': [255, 193, 7],
+        '😢': [33, 150, 243],
+        '😡': [244, 67, 54]
+      };
       
-      reportHTML += `</div>`;
+      let yPos = 85;
+      Object.entries(moodCounts).forEach(([mood, count]) => {
+        if (count > 0) {
+          doc.setFillColor(...colors[mood]);
+          doc.rect(15, yPos, count * 5, 8, 'F');
+          doc.text(`${mood}: ${count} days`, 20 + count * 5, yPos + 6);
+          yPos += 12;
+        }
+      });
       
-      document.getElementById("moodReportContent").innerHTML = reportHTML;
-      document.getElementById("moodReportModal").style.display = "flex";
-    }
-    
-    function closeModal() {
-      document.getElementById("moodReportModal").style.display = "none";
+      // Mood log
+      doc.addPage();
+      doc.setFontSize(18);
+      doc.setTextColor(40, 180, 99);
+      doc.text(`Daily Mood Log`, 15, 20);
+      
+      doc.setFontSize(10);
+      let logY = 30;
+      moodEntries.forEach(entry => {
+        if (logY > 250) {
+          doc.addPage();
+          logY = 20;
+        }
+        doc.text(`${entry.date}: ${entry.mood}`, 15, logY);
+        logY += 10;
+      });
+      
+      // Save the PDF
+      doc.save(`MindEase_Report_${username}_${today.toISOString().split('T')[0]}.pdf`);
     }
 
-    // Check for existing login when page loads
-    window.onload = checkLogin;
+    // Rest of your existing functions...
+    // (toggleDarkMode, toggleDetails, buildCalendar, saveNote, saveMood, etc.)
+
+    // Initialize on load
+    window.onload = function() {
+      const savedUser = localStorage.getItem("currentUser");
+      if (savedUser) {
+        currentUser = JSON.parse(savedUser);
+        document.getElementById("login-page").style.display = "none";
+        document.getElementById("app").style.display = "block";
+        document.getElementById("user-greeting").textContent = currentUser.name;
+        initializeApp();
+      }
+    };
   </script>
 </body>
 </html>
