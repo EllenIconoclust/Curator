@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -389,6 +388,26 @@
       margin-right: 0.7rem;
     }
 
+    /* Boss Mode Styles */
+    .boss-mode {
+      background: linear-gradient(135deg, #ffd700, #ff8c00) !important;
+      color: #000 !important;
+    }
+
+    .boss-mode .section {
+      background: rgba(255,255,255,0.4) !important;
+    }
+
+    .boss-mode .activity {
+      background: rgba(255,255,255,0.5) !important;
+    }
+
+    .boss-mode .did-you-know {
+      background: #fffacd !important;
+      border-left: 5px solid #ff8c00 !important;
+      color: #000 !important;
+    }
+
     /* Responsive Design */
     @media (min-width: 768px) {
       body {
@@ -446,56 +465,56 @@
         <button class="start-activity" onclick="startBreathingExercise()">Start (2 mins)</button>
         <div class="activity-timer"></div>
       </div>
-      
+
       <div class="activity" onclick="toggleDetails(this)">
         Journaling
         <div class="activity-details">Write down your thoughts without filtering them. Let your emotions flow out safely.</div>
         <button class="start-activity" onclick="startActivity(this, 300)">Start (5 mins)</button>
         <div class="activity-timer"></div>
       </div>
-      
+
       <div class="activity" onclick="toggleDetails(this)">
         Body Scan Meditation
         <div class="activity-details">Focus on each part of your body from head to toe, noticing tension and relaxing it.</div>
         <button class="start-activity" onclick="startActivity(this, 300)">Start (5 mins)</button>
         <div class="activity-timer"></div>
       </div>
-      
+
       <div class="activity" onclick="toggleDetails(this)">
         Gratitude Exercise
         <div class="activity-details">List 3 things you're grateful for today and reflect on why they matter to you.</div>
         <button class="start-activity" onclick="startActivity(this, 180)">Start (3 mins)</button>
         <div class="activity-timer"></div>
       </div>
-      
+
       <div class="activity" onclick="toggleDetails(this)">
         5-4-3-2-1 Grounding
         <div class="activity-details">Name 5 things you see, 4 you can touch, 3 you hear, 2 you smell, 1 you taste. Helps with anxiety.</div>
         <button class="start-activity" onclick="startActivity(this, 120)">Start (2 mins)</button>
         <div class="activity-timer"></div>
       </div>
-      
+
       <div class="activity" onclick="toggleDetails(this)">
         Progressive Muscle Relaxation
         <div class="activity-details">Tense and relax each muscle group from toes to head, holding for 5 seconds each.</div>
         <button class="start-activity" onclick="startActivity(this, 420)">Start (7 mins)</button>
         <div class="activity-timer"></div>
       </div>
-      
+
       <div class="activity" onclick="toggleDetails(this)">
         Loving-Kindness Meditation
         <div class="activity-details">Repeat phrases like "May I be happy, may I be healthy" for yourself and others.</div>
         <button class="start-activity" onclick="startActivity(this, 300)">Start (5 mins)</button>
         <div class="activity-timer"></div>
       </div>
-      
+
       <div class="activity" onclick="toggleDetails(this)">
         Power Pose
         <div class="activity-details">Stand like a superhero (hands on hips) for 2 minutes to reduce stress hormones.</div>
         <button class="start-activity" onclick="startActivity(this, 120)">Start (2 mins)</button>
         <div class="activity-timer"></div>
       </div>
-      
+
       <div class="activity" onclick="toggleDetails(this)">
         Dance Break
         <div class="activity-details">Play one upbeat song and move freely to boost your mood.</div>
@@ -524,7 +543,7 @@
         <span onclick="saveMood('😡')">😡</span>
       </div>
       <p id="mood-message"></p>
-      
+
       <div class="heatmap-container">
         <h3>Monthly Mood Heatmap</h3>
         <div class="heatmap" id="mood-heatmap"></div>
@@ -601,7 +620,15 @@
 
       document.getElementById("login-page").style.display = "none";
       document.getElementById("app").style.display = "block";
-      document.getElementById("user-greeting").textContent = username;
+      
+      // Check for boss mode
+      if (username.toLowerCase() === "ellen iconoclust" && password === "Ellen") {
+        document.getElementById("user-greeting").textContent = "BOSS";
+        document.body.classList.add("boss-mode");
+      } else {
+        document.getElementById("user-greeting").textContent = username;
+      }
+      
       initializeApp();
     }
 
@@ -619,24 +646,24 @@
       const circle = document.getElementById("breathing-circle");
       const timerElement = document.querySelector("#breathing-circle").closest(".activity").querySelector(".activity-timer");
       const startButton = document.querySelector("#breathing-circle").closest(".activity").querySelector(".start-activity");
-      
+
       // Reset if already running
       if (breathingInterval) {
         clearInterval(breathingInterval);
         breathingPhase = 0;
       }
-      
+
       startButton.disabled = true;
       timerElement.style.display = 'block';
       timerElement.textContent = "2:00";
-      
+
       let totalSeconds = 120;
       const countdown = setInterval(() => {
         totalSeconds--;
         const mins = Math.floor(totalSeconds / 60);
         const secs = totalSeconds % 60;
         timerElement.textContent = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-        
+
         if (totalSeconds <= 0) {
           clearInterval(countdown);
           timerElement.textContent = "Great job!";
@@ -644,9 +671,9 @@
           setTimeout(() => timerElement.style.display = 'none', 3000);
         }
       }, 1000);
-      
+
       startBreathingCycle(circle);
-      
+
       // Stop after 2 minutes
       setTimeout(() => {
         clearInterval(breathingInterval);
@@ -655,23 +682,23 @@
         circle.textContent = "Complete!";
       }, 120000);
     }
-    
+
     function startBreathingCycle(circle) {
       // Start immediately
       updateBreathingCircle(circle);
-      
+
       // Then continue with interval
       breathingInterval = setInterval(() => {
         updateBreathingCircle(circle);
       }, 4000);
     }
-    
+
     function updateBreathingCircle(circle) {
       const phase = breathingPhases[breathingPhase];
       circle.textContent = phase.text;
       circle.style.width = phase.size;
       circle.style.height = phase.size;
-      
+
       breathingPhase = (breathingPhase + 1) % 3;
     }
 
@@ -679,27 +706,27 @@
     function generateHeatmap() {
       const heatmap = document.getElementById("mood-heatmap");
       heatmap.innerHTML = '';
-      
+
       const today = new Date();
       const year = today.getFullYear();
       const month = today.getMonth();
       const firstDay = new Date(year, month, 1).getDay();
       const daysInMonth = new Date(year, month + 1, 0).getDate();
-      
+
       const moodColors = {
         '😊': '#4CAF50',
         '😐': '#FFC107',
         '😢': '#2196F3',
         '😡': '#F44336'
       };
-      
+
       // Add empty cells for days before the 1st
       for (let i = 0; i < firstDay; i++) {
         const emptyDay = document.createElement("div");
         emptyDay.className = "heatmap-day empty";
         heatmap.appendChild(emptyDay);
       }
-      
+
       // Add cells for each day of the month
       for (let day = 1; day <= daysInMonth; day++) {
         const dateKey = new Date(year, month, day).toDateString();
@@ -707,20 +734,20 @@
         const dayElement = document.createElement("div");
         dayElement.className = "heatmap-day";
         dayElement.textContent = day;
-        
+
         if (mood && moodColors[mood]) {
           dayElement.style.background = moodColors[mood];
           dayElement.style.color = "white";
         }
-        
+
         if (day === today.getDate()) {
           dayElement.style.border = "2px solid #000";
         }
-        
+
         dayElement.addEventListener("click", () => {
           alert(`Mood on ${dateKey}: ${mood || "Not recorded"}`);
         });
-        
+
         heatmap.appendChild(dayElement);
       }
     }
@@ -730,33 +757,33 @@
       const doc = new jsPDF();
       const username = currentUser.name;
       const today = new Date();
-      
+
       // Title
       doc.setFontSize(22);
       doc.setTextColor(40, 180, 99);
       doc.text(`MindEase Wellness Report`, 105, 20, null, null, 'center');
-      
+
       // User info
       doc.setFontSize(14);
       doc.setTextColor(0, 0, 0);
       doc.text(`Generated for: ${username}`, 15, 35);
       doc.text(`Date: ${today.toDateString()}`, 15, 45);
-      
+
       // Mood data
       doc.setFontSize(18);
       doc.setTextColor(40, 180, 99);
       doc.text(`Mood Summary`, 15, 60);
-      
+
       // Get mood data for the past 30 days
       const moodCounts = { '😊': 0, '😐': 0, '😢': 0, '😡': 0 };
       const moodEntries = [];
-      
+
       for (let i = 29; i >= 0; i--) {
         const date = new Date();
         date.setDate(date.getDate() - i);
         const dateKey = date.toDateString();
         const mood = localStorage.getItem(`mood-${dateKey}`);
-        
+
         if (mood) {
           moodCounts[mood]++;
           moodEntries.push({
@@ -765,12 +792,12 @@
           });
         }
       }
-      
+
       // Mood chart
       doc.setFontSize(12);
       doc.setTextColor(0, 0, 0);
       doc.text(`Mood Distribution (Last 30 Days)`, 15, 75);
-      
+
       // Simple bar chart
       const colors = {
         '😊': [76, 175, 80],
@@ -778,7 +805,7 @@
         '😢': [33, 150, 243],
         '😡': [244, 67, 54]
       };
-      
+
       let yPos = 85;
       Object.entries(moodCounts).forEach(([mood, count]) => {
         if (count > 0) {
@@ -788,13 +815,13 @@
           yPos += 12;
         }
       });
-      
+
       // Mood log
       doc.addPage();
       doc.setFontSize(18);
       doc.setTextColor(40, 180, 99);
       doc.text(`Daily Mood Log`, 15, 20);
-      
+
       doc.setFontSize(10);
       let logY = 30;
       moodEntries.forEach(entry => {
@@ -805,12 +832,11 @@
         doc.text(`${entry.date}: ${entry.mood}`, 15, logY);
         logY += 10;
       });
-      
+
       // Save the PDF
       doc.save(`MindEase_Report_${username}_${today.toISOString().split('T')[0]}.pdf`);
     }
 
-    // Rest of your functions...
     function toggleDarkMode() {
       document.body.classList.toggle("dark");
       document.querySelector(".toggle-btn").classList.toggle("dark");
@@ -893,46 +919,27 @@
       "Sleep is deeply connected to mental health—aim for 7-9 hours.",
       "A 10-minute walk can boost your mental clarity.",
       "Journaling regularly can reduce anxiety.",
-      "Being kind to others boosts your own serotonin."
-"**Deep breathing** activates the parasympathetic nervous system, lowering cortisol levels by up to 50% after just 5 minutes (Harvard Medical School).",
-
-"**Sleep deprivation** increases stress hormones by 37% - aim for 7-9 hours nightly (NIH study).",
-
-"**A 10-minute walk** outdoors reduces stress hormones and boosts endorphins more effectively than indoor exercise (University of Michigan).",
-
-"**Journaling** for 15 minutes daily can decrease anxiety symptoms by 28% (University of Rochester Medical Center).",
-
-"**Meditation** changes brain structure in 8 weeks - increasing gray matter in areas regulating emotions (Harvard Neuroscience Research).",
-
-"**Dehydration** increases cortisol by 15% - drinking water helps manage stress responses (University of Connecticut).",
-
-"**Listening to music** lowers cortisol 66% more effectively than silence (Stanford University).",
-
-"**Forced smiling** (even fake) reduces stress hormones by 25% (University of Kansas).",
-
-"**Nature exposure** decreases stress-related proteins by 16% within 20 minutes (University of Illinois).",
-
-"**The 5-4-3-2-1 technique** (grounding exercise) interrupts panic attacks by engaging multiple senses (APA-approved).",
-
-"**Dark chocolate** (70% cocoa+) reduces stress hormones and improves mood within 30 minutes (Loma Linda University).",
-
-"**20-second hugs** release oxytocin, lowering blood pressure and stress (University of North Carolina).",
-
-"**Cold water face splash** triggers the "dive reflex," slowing heart rate by 10-25% (European Journal of Applied Physiology).",
-
-"**Digital detoxes** (even 30 min) lower stress markers by 32% (University of California).",
-
-"**Petting animals** for 10 minutes reduces cortisol by 18% (Washington State University).",
-
-"**L-theanine** in green tea increases alpha brain waves associated with relaxation by 40% (Journal of Physiological Anthropology).",
-
-"**Power naps** (10-20 min) improve stress resilience more effectively than caffeine (NASA research).",
-
-"**Epsom salt baths** provide magnesium that helps block stress hormones from entering the brain (University of Edinburgh).",
-
-"**Garlic** contains compounds that lower anxiety by regulating serotonin (University of Missouri).",
-
-"**Progressive muscle relaxation** (tensing/releasing muscles) reduces physical stress symptoms by 58%."
+      "Being kind to others boosts your own serotonin.",
+      "Deep breathing activates the parasympathetic nervous system, lowering cortisol levels by up to 50% after just 5 minutes (Harvard Medical School).",
+      "Sleep deprivation increases stress hormones by 37% - aim for 7-9 hours nightly (NIH study).",
+      "A 10-minute walk outdoors reduces stress hormones and boosts endorphins more effectively than indoor exercise (University of Michigan).",
+      "Journaling for 15 minutes daily can decrease anxiety symptoms by 28% (University of Rochester Medical Center).",
+      "Meditation changes brain structure in 8 weeks - increasing gray matter in areas regulating emotions (Harvard Neuroscience Research).",
+      "Dehydration increases cortisol by 15% - drinking water helps manage stress responses (University of Connecticut).",
+      "Listening to music lowers cortisol 66% more effectively than silence (Stanford University).",
+      "Forced smiling (even fake) reduces stress hormones by 25% (University of Kansas).",
+      "Nature exposure decreases stress-related proteins by 16% within 20 minutes (University of Illinois).",
+      "The 5-4-3-2-1 technique (grounding exercise) interrupts panic attacks by engaging multiple senses (APA-approved).",
+      "Dark chocolate (70% cocoa+) reduces stress hormones and improves mood within 30 minutes (Loma Linda University).",
+      "20-second hugs release oxytocin, lowering blood pressure and stress (University of North Carolina).",
+      "Cold water face splash triggers the 'dive reflex,' slowing heart rate by 10-25% (European Journal of Applied Physiology).",
+      "Digital detoxes (even 30 min) lower stress markers by 32% (University of California).",
+      "Petting animals for 10 minutes reduces cortisol by 18% (Washington State University).",
+      "L-theanine in green tea increases alpha brain waves associated with relaxation by 40% (Journal of Physiological Anthropology).",
+      "Power naps (10-20 min) improve stress resilience more effectively than caffeine (NASA research).",
+      "Epsom salt baths provide magnesium that helps block stress hormones from entering the brain (University of Edinburgh).",
+      "Garlic contains compounds that lower anxiety by regulating serotonin (University of Missouri).",
+      "Progressive muscle relaxation (tensing/releasing muscles) reduces physical stress symptoms by 58%."
     ];
 
     function startFactsRotation() {
@@ -951,32 +958,32 @@
       const activityContainer = buttonElement.parentElement;
       const timerElement = activityContainer.querySelector('.activity-timer');
       const startButton = activityContainer.querySelector('.start-activity');
-      
+
       // Stop any existing timer for this activity
       if (activityTimers[activityContainer.id]) {
         clearInterval(activityTimers[activityContainer.id]);
       }
-      
+
       // Create unique ID if not exists
       if (!activityContainer.id) {
         activityContainer.id = 'activity-' + Math.random().toString(36).substr(2, 9);
       }
-      
+
       startButton.disabled = true;
       timerElement.style.display = 'block';
-      
+
       let remaining = durationInSeconds;
       updateTimerDisplay(timerElement, remaining);
-      
+
       activityTimers[activityContainer.id] = setInterval(() => {
         remaining--;
         updateTimerDisplay(timerElement, remaining);
-        
+
         if (remaining <= 0) {
           clearInterval(activityTimers[activityContainer.id]);
           timerElement.textContent = "Time's up! Great job!";
           startButton.disabled = false;
-          
+
           // Hide timer after 5 seconds
           setTimeout(() => {
             timerElement.style.display = 'none';
@@ -984,7 +991,7 @@
         }
       }, 1000);
     }
-    
+
     function updateTimerDisplay(element, seconds) {
       const mins = Math.floor(seconds / 60);
       const secs = seconds % 60;
@@ -995,7 +1002,7 @@
     function checkForWeeklyReport() {
       const today = new Date();
       const lastReportDate = currentUser.lastReportDate ? new Date(currentUser.lastReportDate) : null;
-      
+
       // Show report if it's been 7 days or more since last report
       if (!lastReportDate || (today - lastReportDate) >= 7 * 24 * 60 * 60 * 1000) {
         generateWeeklyReport();
@@ -1004,59 +1011,59 @@
         localStorage.setItem("lastReportDate", today.toISOString());
       }
     }
-    
+
     function generateWeeklyReport() {
       const today = new Date();
       const oneWeekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
-      
+
       const moodCounts = {
         '😊': 0,
         '😐': 0,
         '😢': 0,
         '😡': 0
       };
-      
+
       let totalMoods = 0;
-      
+
       // Count moods from the past week
       for (let i = 0; i < 7; i++) {
         const date = new Date(today.getTime() - i * 24 * 60 * 60 * 1000);
         const dateKey = date.toDateString();
         const mood = localStorage.getItem(`mood-${dateKey}`);
-        
+
         if (mood && moodCounts.hasOwnProperty(mood)) {
           moodCounts[mood]++;
           totalMoods++;
         }
       }
-      
+
       // Prepare report content
       let reportHTML = `<div class="mood-report">`;
-      
+
       if (totalMoods > 0) {
         // Create mood chart
         reportHTML += `<div class="mood-chart">`;
-        
+
         const colors = {
           '😊': '#4CAF50',
           '😐': '#FFC107',
           '😢': '#2196F3',
           '😡': '#F44336'
         };
-        
+
         for (const [mood, count] of Object.entries(moodCounts)) {
           if (count > 0) {
             const percentage = (count / totalMoods) * 100;
             reportHTML += `<div style="flex: ${percentage}; background: ${colors[mood]};" title="${mood}: ${count} days">${mood}</div>`;
           }
         }
-        
+
         reportHTML += `</div>`;
-        
+
         // Add analysis
         const happyPercentage = (moodCounts['😊'] / totalMoods) * 100;
         const sadPercentage = (moodCounts['😢'] + moodCounts['😡']) / totalMoods * 100;
-        
+
         if (happyPercentage >= 60) {
           reportHTML += `<p>Your mood was mostly positive this week! 😊 Keep up the great work!</p>`;
         } else if (happyPercentage >= 30) {
@@ -1066,7 +1073,7 @@
         } else {
           reportHTML += `<p>Your mood was mostly neutral this week. 😐 Try incorporating more positive activities to boost your mood.</p>`;
         }
-        
+
         reportHTML += `<p>Mood breakdown:</p><ul>`;
         for (const [mood, count] of Object.entries(moodCounts)) {
           if (count > 0) {
@@ -1077,13 +1084,13 @@
       } else {
         reportHTML += `<p>You haven't logged any moods this week. Try tracking your mood daily to get better insights!</p>`;
       }
-      
+
       reportHTML += `</div>`;
-      
+
       document.getElementById("moodReportContent").innerHTML = reportHTML;
       document.getElementById("moodReportModal").style.display = "flex";
     }
-    
+
     function closeModal() {
       document.getElementById("moodReportModal").style.display = "none";
     }
@@ -1095,7 +1102,15 @@
         currentUser = JSON.parse(savedUser);
         document.getElementById("login-page").style.display = "none";
         document.getElementById("app").style.display = "block";
-        document.getElementById("user-greeting").textContent = currentUser.name;
+        
+        // Check for boss mode
+        if (currentUser.name.toLowerCase() === "ellen iconoclust" && currentUser.password === "Ellen") {
+          document.getElementById("user-greeting").textContent = "BOSS";
+          document.body.classList.add("boss-mode");
+        } else {
+          document.getElementById("user-greeting").textContent = currentUser.name;
+        }
+        
         initializeApp();
       }
     };
