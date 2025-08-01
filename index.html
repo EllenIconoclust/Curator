@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Peaceful Mind</title>
   <link href="https://fonts.googleapis.com/css2?family=Quicksand&display=swap" rel="stylesheet">
   <style>
@@ -16,13 +17,53 @@
       transition: background 1s, color 1s;
       background: linear-gradient(135deg, #e0f8e9, #ffffff);
       color: #222;
-      padding: 2rem;
+      padding: 1rem;
       line-height: 1.8;
     }
 
     body.dark {
       background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
       color: #f1f1f1;
+    }
+
+    /* Login Page Styles */
+    .login-container {
+      max-width: 400px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background: rgba(255,255,255,0.9);
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .login-container h1 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .login-input {
+      width: 100%;
+      padding: 0.8rem;
+      margin: 0.5rem 0 1rem;
+      border: 1px solid #aaa;
+      border-radius: 8px;
+      font-size: 1rem;
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 0.8rem;
+      background: #7acaa3;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      margin-top: 1rem;
+    }
+
+    /* Main App Styles (hidden initially) */
+    .app-container {
+      display: none;
     }
 
     .toggle-wrapper {
@@ -59,12 +100,13 @@
     }
 
     h1 {
-      margin-bottom: 2rem;
-      font-size: 2.5rem;
+      margin-bottom: 1.5rem;
+      font-size: 2rem;
+      text-align: center;
     }
 
     .section {
-      margin-bottom: 5rem;
+      margin-bottom: 3rem;
     }
 
     .activity {
@@ -82,29 +124,43 @@
     .activity-details {
       display: none;
       margin-top: 0.5rem;
-      font-size: 1rem;
+      font-size: 0.9rem;
       opacity: 0.9;
     }
 
     .calendar {
       margin-top: 1rem;
+      overflow-x: auto;
     }
 
     table {
       border-collapse: collapse;
       width: 100%;
-      font-size: 1rem;
+      font-size: 0.9rem;
     }
 
     th, td {
-      padding: 0.8rem;
+      padding: 0.5rem;
       text-align: center;
       border: 1px solid #ccc;
+      min-width: 30px;
     }
 
     td.today {
       background: #a0f3ba;
       font-weight: bold;
+    }
+
+    td.has-mood {
+      position: relative;
+    }
+
+    td.has-mood::after {
+      content: attr(data-mood);
+      position: absolute;
+      bottom: 2px;
+      right: 2px;
+      font-size: 0.7rem;
     }
 
     input[type="text"], textarea {
@@ -124,6 +180,7 @@
       border-radius: 8px;
       cursor: pointer;
       font-size: 1rem;
+      width: 100%;
     }
 
     .mood-options span {
@@ -137,7 +194,7 @@
       background: #d2f3e6;
       border-left: 5px solid #49a379;
       border-radius: 8px;
-      font-size: 1.1rem;
+      font-size: 1rem;
     }
 
     #mood-message, #saved-note, #response-message {
@@ -145,68 +202,165 @@
       font-size: 1rem;
     }
 
+    @media (min-width: 768px) {
+      body {
+        padding: 2rem;
+      }
+      
+      h1 {
+        font-size: 2.5rem;
+        text-align: left;
+      }
+      
+      button.save, button.spin, button.submit-problem {
+        width: auto;
+      }
+      
+      th, td {
+        padding: 0.8rem;
+        min-width: 40px;
+      }
+    }
   </style>
 </head>
 <body>
-  <div class="toggle-wrapper">
-    <button class="toggle-btn" onclick="toggleDarkMode()">
-      <div class="toggle-icon"></div>
-    </button>
+  <!-- Login Page -->
+  <div class="login-container" id="login-page">
+    <h1>MindEase Login</h1>
+    <input type="text" id="username" class="login-input" placeholder="Your Name">
+    <input type="password" id="password" class="login-input" placeholder="Password">
+    <button class="login-btn" onclick="login()">Enter</button>
+    <p id="login-message" style="text-align: center; margin-top: 1rem;"></p>
   </div>
 
-  <h1>MindEase</h1>
-
-  <div class="section">
-    <h2>🍃 Peace Activities</h2>
-    <div class="activity" onclick="toggleDetails(this)">
-      Deep Breathing
-      <div class="activity-details">Breathe in for 4 seconds, hold for 4, and breathe out for 4. Repeat 5 times.</div>
+  <!-- Main App (hidden initially) -->
+  <div class="app-container" id="app">
+    <div class="toggle-wrapper">
+      <button class="toggle-btn" onclick="toggleDarkMode()">
+        <div class="toggle-icon"></div>
+      </button>
     </div>
-    <div class="activity" onclick="toggleDetails(this)">
-      Journaling
-      <div class="activity-details">Write down your thoughts without filtering them. Let your emotions flow out safely.</div>
-    </div>
-    <div class="activity" onclick="toggleDetails(this)">
-      Body Scan Meditation
-      <div class="activity-details">Focus on each part of your body from head to toe, noticing tension and relaxing it.</div>
-    </div>
-    <div class="activity" onclick="toggleDetails(this)">
-      Gratitude Exercise
-      <div class="activity-details">List 3 things you're grateful for today and reflect on why they matter to you.</div>
-    </div>
-  </div>
 
-  <div class="section">
-    <h2>📅 Wellness Calendar</h2>
-    <table id="calendar"></table>
-    <input type="text" id="note" placeholder="Add note for today">
-    <button class="save" onclick="saveNote()">Save</button>
-    <p id="saved-note"></p>
-  </div>
+    <h1>Welcome to MindEase, <span id="user-greeting"></span>!</h1>
 
-  <div class="section">
-    <h2>📊 Mood Tracker</h2>
-    <div class="mood-options">
-      <span onclick="saveMood('😊')">😊</span>
-      <span onclick="saveMood('😐')">😐</span>
-      <span onclick="saveMood('😢')">😢</span>
-      <span onclick="saveMood('😡')">😡</span>
+    <div class="section">
+      <h2>🍃 Peace Activities</h2>
+      <div class="activity" onclick="toggleDetails(this)">
+        Deep Breathing
+        <div class="activity-details">Breathe in for 4 seconds, hold for 4, and breathe out for 4. Repeat 5 times.</div>
+      </div>
+      <div class="activity" onclick="toggleDetails(this)">
+        Journaling
+        <div class="activity-details">Write down your thoughts without filtering them. Let your emotions flow out safely.</div>
+      </div>
+      <div class="activity" onclick="toggleDetails(this)">
+        Body Scan Meditation
+        <div class="activity-details">Focus on each part of your body from head to toe, noticing tension and relaxing it.</div>
+      </div>
+      <div class="activity" onclick="toggleDetails(this)">
+        Gratitude Exercise
+        <div class="activity-details">List 3 things you're grateful for today and reflect on why they matter to you.</div>
+      </div>
     </div>
-    <p id="mood-message"></p>
-  </div>
 
-  <div class="section">
-    <h2>💬 Share Your Problem</h2>
-    <textarea id="problem" rows="5" placeholder="Type what's on your mind..."></textarea><br>
-    <button class="submit-problem" onclick="respondToProblem()">Submit</button>
-    <p id="response-message"></p>
-  </div>
+    <div class="section">
+      <h2>📅 Wellness Calendar</h2>
+      <div class="calendar">
+        <table id="calendar"></table>
+      </div>
+      <input type="text" id="note" placeholder="Add note for today">
+      <button class="save" onclick="saveNote()">Save</button>
+      <p id="saved-note"></p>
+    </div>
 
-  <div class="did-you-know" id="fact-box">
-    🌟 Did you know? Taking just 5 minutes to breathe deeply can reduce stress significantly.
+    <div class="section">
+      <h2>📊 Mood Tracker</h2>
+      <div class="mood-options">
+        <span onclick="saveMood('😊')">😊</span>
+        <span onclick="saveMood('😐')">😐</span>
+        <span onclick="saveMood('😢')">😢</span>
+        <span onclick="saveMood('😡')">😡</span>
+      </div>
+      <p id="mood-message"></p>
+    </div>
+
+    <div class="section">
+      <h2>💬 Share Your Problem</h2>
+      <textarea id="problem" rows="5" placeholder="Type what's on your mind..."></textarea><br>
+      <button class="submit-problem" onclick="respondToProblem()">Submit</button>
+      <p id="response-message"></p>
+    </div>
+
+    <div class="did-you-know" id="fact-box">
+      🌟 Did you know? Taking just 5 minutes to breathe deeply can reduce stress significantly.
+    </div>
   </div>
 
   <script>
+    // User data
+    let currentUser = null;
+    
+    // Login function
+    function login() {
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value;
+      const loginMessage = document.getElementById("login-message");
+      
+      if (!username) {
+        loginMessage.textContent = "Please enter your name";
+        loginMessage.style.color = "red";
+        return;
+      }
+      
+      if (!password) {
+        loginMessage.textContent = "Please enter a password";
+        loginMessage.style.color = "red";
+        return;
+      }
+      
+      // Simple password check (in a real app, this would be more secure)
+      if (password.length < 4) {
+        loginMessage.textContent = "Password must be at least 4 characters";
+        loginMessage.style.color = "red";
+        return;
+      }
+      
+      // Store user data
+      currentUser = {
+        name: username,
+        password: password
+      };
+      
+      localStorage.setItem("currentUser", JSON.stringify(currentUser));
+      
+      // Hide login, show app
+      document.getElementById("login-page").style.display = "none";
+      document.getElementById("app").style.display = "block";
+      document.getElementById("user-greeting").textContent = username;
+      
+      // Initialize app
+      initializeApp();
+    }
+    
+    // Check if user is already logged in
+    function checkLogin() {
+      const savedUser = localStorage.getItem("currentUser");
+      if (savedUser) {
+        currentUser = JSON.parse(savedUser);
+        document.getElementById("login-page").style.display = "none";
+        document.getElementById("app").style.display = "block";
+        document.getElementById("user-greeting").textContent = currentUser.name;
+        initializeApp();
+      }
+    }
+    
+    // Initialize the app
+    function initializeApp() {
+      buildCalendar();
+      loadSavedData();
+      startFactsRotation();
+    }
+
     function toggleDarkMode() {
       document.body.classList.toggle("dark");
       document.querySelector(".toggle-btn").classList.toggle("dark");
@@ -229,9 +383,14 @@
 
       let html = "<tr>" + weekdays.map(d => `<th>${d}</th>`).join('') + "</tr><tr>";
       for (let i = 0; i < firstDay; i++) html += "<td></td>";
+      
       for (let d = 1; d <= daysInMonth; d++) {
         const isToday = d === day ? 'today' : '';
-        html += `<td class="${isToday}">${d}</td>`;
+        const dateKey = new Date(year, month, d).toDateString();
+        const mood = localStorage.getItem(`mood-${dateKey}`);
+        const hasMood = mood ? 'has-mood' : '';
+        
+        html += `<td class="${isToday} ${hasMood}" data-mood="${mood || ''}">${d}</td>`;
         if ((firstDay + d) % 7 === 0) html += "</tr><tr>";
       }
       html += "</tr>";
@@ -248,18 +407,34 @@
     }
 
     function saveMood(mood) {
-      document.getElementById("mood-message").textContent = "You logged your mood as: " + mood;
-      localStorage.setItem("mood-" + new Date().toDateString(), mood);
+      const message = document.getElementById("mood-message");
+      const dateKey = new Date().toDateString();
+      
+      if (mood) {
+        message.textContent = `You logged your mood as: ${mood}`;
+        localStorage.setItem("mood-" + dateKey, mood);
+        
+        // Update calendar display
+        buildCalendar();
+      }
     }
 
     function respondToProblem() {
       const input = document.getElementById("problem").value;
       const msg = document.getElementById("response-message");
       if (input.trim() !== "") {
-        msg.textContent = "Thank you for sharing. Healing is a process, and every step you take matters. You're not alone.";
+        msg.textContent = `${currentUser.name}, thank you for sharing. Healing is a process, and every step you take matters. You're not alone.`;
       } else {
         msg.textContent = "";
       }
+    }
+
+    function loadSavedData() {
+      const savedNote = localStorage.getItem("note-" + new Date().toDateString());
+      if (savedNote) document.getElementById("saved-note").textContent = "Saved for today: " + savedNote;
+      
+      const mood = localStorage.getItem("mood-" + new Date().toDateString());
+      if (mood) document.getElementById("mood-message").textContent = "You logged your mood as: " + mood;
     }
 
     const facts = [
@@ -270,19 +445,19 @@
       "Being kind to others boosts your own serotonin."
     ];
 
-    setInterval(() => {
+    function startFactsRotation() {
       const box = document.getElementById("fact-box");
       const randomFact = facts[Math.floor(Math.random() * facts.length)];
       box.textContent = "🌟 Did you know? " + randomFact;
-    }, 10000);
+      
+      setInterval(() => {
+        const randomFact = facts[Math.floor(Math.random() * facts.length)];
+        box.textContent = "🌟 Did you know? " + randomFact;
+      }, 10000);
+    }
 
-    window.onload = function() {
-      buildCalendar();
-      const saved = localStorage.getItem("note-" + new Date().toDateString());
-      if (saved) document.getElementById("saved-note").textContent = "Saved for today: " + saved;
-      const mood = localStorage.getItem("mood-" + new Date().toDateString());
-      if (mood) document.getElementById("mood-message").textContent = "You logged your mood as: " + mood;
-    };
+    // Check for existing login when page loads
+    window.onload = checkLogin;
   </script>
 </body>
 </html>
